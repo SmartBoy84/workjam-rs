@@ -6,7 +6,7 @@ So - WorkjamRequest::<Notifications>::new() - error: provide a config
 
 use std::borrow::Cow;
 
-use crate::client::backend::request::{HasCompanyID, HasEmployeeID, HasLocationID, RequestConfig};
+use super::{RequestConfig, HasCompanyID, HasEmployeeID, HasLocationID};
 
 // with Cow I can create cheap one-time configs using &str, or configs which own the data (so I don't have to think about the data being in two places)
 pub struct CompanyID<'a>(Cow<'a, str>);

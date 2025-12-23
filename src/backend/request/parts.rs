@@ -2,9 +2,7 @@
 
 use std::marker::PhantomData;
 
-use crate::client::backend::request::{HasCompanyID, HasEmployeeID};
-
-use super::{RequestConfig, RequestPart, SerialiseRequestPart};
+use super::{HasCompanyID, HasEmployeeID, RequestConfig, RequestPart, SerialiseRequestPart};
 
 macro_rules! request_part {
     ($name: ident, $word: literal, $default: ty) => {
@@ -41,7 +39,6 @@ request_part!(Auth, "auth", ());
 request_part!(V3, "v3", Auth);
 
 impl RequestPart for () {}
-
 
 impl<C: RequestConfig> SerialiseRequestPart<C> for () {
     const WORD: &str = "";
