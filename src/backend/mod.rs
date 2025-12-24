@@ -45,7 +45,6 @@ impl<C: WorkjamHttpClient> WorkjamClient<C> {
     where
         T: DeserializeOwned,
     {
-        println!("{}", uri);
         /*
         Workjam API has certain endpoints (only found Authorise so far) which requires a patch request with a bearer token to get
          */

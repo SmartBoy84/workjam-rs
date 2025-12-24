@@ -1,5 +1,6 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
+pub mod coworkers;
 pub mod events;
 pub mod notifications;
 
@@ -16,9 +17,8 @@ pub struct Location {
     name: String,
     #[serde(rename = "type")]
     location_type: LocationType,
-    external_id: String,
-    external_code: String,
     time_zone_id: String,
+    // externalCode, externalId ignored
 }
 
 #[derive(Deserialize)]

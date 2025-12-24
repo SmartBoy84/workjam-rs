@@ -2,6 +2,8 @@
 
 use std::marker::PhantomData;
 
+use crate::backend::request::{HasLocationID, HasShiftID};
+
 use super::{HasCompanyID, HasEmployeeID, RequestConfig, RequestPart, SerialiseRequestPart};
 
 macro_rules! request_part {
@@ -32,15 +34,14 @@ macro_rules! request_part {
     };
 }
 
-request_part!(Users, "users", Company, HasEmployeeID, employee_id);
-request_part!(
-    Employees,
-    "employees",
-    Company::<V4>,
-    HasEmployeeID,
-    employee_id
-);
-request_part!(Company, "companies", V1, HasCompanyID, company_id);
+// the defaults as set such that they include the most points possible
+// e.g., default of Company is v4, because more require v4/company than v1/company
+
+request_part!(Shifts, "shifts", Locations, HasShiftID, shift_id);
+request_part!(Locations, "locations", Company, HasLocationID, location_id);
+request_part!(Users, "users", Company::<V1>, HasEmployeeID, employee_id);
+request_part!(Employees, "employees", Company, HasEmployeeID, employee_id);
+request_part!(Company, "companies", V4, HasCompanyID, company_id);
 request_part!(V1, "v1", ());
 request_part!(Auth, "auth", ());
 request_part!(V3, "v3", Auth);

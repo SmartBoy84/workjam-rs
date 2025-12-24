@@ -5,8 +5,8 @@ use serde::de::DeserializeOwned;
 use super::{
     RequestConfig, RequestPart, SerialiseRequestPart,
     parameters::{EventsPara, NotifPara, QueryParameters},
-    parts::{Employees, Users, V3},
-    payload::{AuthRes, events::EventRes, notifications::NotifRes},
+    parts::{Employees, Shifts, Users, V3},
+    payload::{AuthRes, coworkers::CoworkersRes, events::EventsRes, notifications::NotifRes},
 };
 
 pub trait Endpoint {
@@ -43,6 +43,8 @@ macro_rules! endpoint {
     };
 }
 
+// endpoint!(pub ShiftDetail, "", Shifts, ShiftRes, ShiftPara) // Hella complicated (i.e., deep nesting) - can't be arsed
+endpoint!(pub Coworkers, "coworkers", Shifts, CoworkersRes);
 endpoint!(pub Notif, "notifications", Users, NotifRes, NotifPara);
 endpoint!(pub Auth, "", V3, AuthRes);
-endpoint!(pub Events, "events", Employees, EventRes, EventsPara);
+endpoint!(pub Events, "events", Employees, EventsRes, EventsPara);

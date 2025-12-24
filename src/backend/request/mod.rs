@@ -11,6 +11,8 @@ use std::marker::PhantomData;
 use endpoints::{Endpoint, EndpointWithParameters};
 use parameters::QueryParameters;
 
+use crate::backend::request::{parts::Shifts, payload::events::EventData};
+
 use super::ROOT;
 
 pub trait SerialiseRequestPart<C: RequestConfig>: RequestPart {
@@ -41,14 +43,17 @@ pub trait RequestPart {
 }
 
 pub trait RequestConfig {}
-trait HasEmployeeID: RequestConfig {
+pub trait HasEmployeeID: RequestConfig {
     fn employee_id(&self) -> &str;
 }
-trait HasCompanyID: RequestConfig {
+pub trait HasCompanyID: RequestConfig {
     fn company_id(&self) -> &str;
 }
-trait HasLocationID: RequestConfig {
+pub trait HasLocationID: RequestConfig {
     fn location_id(&self) -> &str;
+}
+pub trait HasShiftID: RequestConfig {
+    fn shift_id(&self) -> &str;
 }
 
 impl RequestConfig for () {}
