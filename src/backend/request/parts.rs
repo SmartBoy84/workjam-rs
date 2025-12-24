@@ -33,10 +33,18 @@ macro_rules! request_part {
 }
 
 request_part!(Users, "users", Company, HasEmployeeID, employee_id);
+request_part!(
+    Employees,
+    "employees",
+    Company::<V4>,
+    HasEmployeeID,
+    employee_id
+);
 request_part!(Company, "companies", V1, HasCompanyID, company_id);
 request_part!(V1, "v1", ());
 request_part!(Auth, "auth", ());
 request_part!(V3, "v3", Auth);
+request_part!(V4, "v4", ());
 
 impl RequestPart for () {}
 

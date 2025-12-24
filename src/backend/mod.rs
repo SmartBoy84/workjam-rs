@@ -3,6 +3,7 @@ pub(super) mod ureq;
 
 use std::io::{self, Read};
 
+use http::header::ACCEPT_LANGUAGE;
 use thiserror::Error;
 
 pub const AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0";
@@ -61,7 +62,7 @@ impl<C: WorkjamHttpClient> WorkjamClient<C> {
     {
         Ok(serde_json::from_reader(
             self.inner
-                .get(uri)
+                .get(uri, (ACCEPT_LANGUAGE.as_str(), "*"))
                 .map_err(|e| WorkjamBackendError::HttpError(e))?,
         )?)
     }
@@ -69,7 +70,7 @@ impl<C: WorkjamHttpClient> WorkjamClient<C> {
     pub(super) fn get_raw(&self, uri: &str) -> WorkjamBackendResult<String, C> {
         let mut s = String::new();
         self.inner
-            .get(uri)
+            .get(uri, (ACCEPT_LANGUAGE.as_str(), "*"))
             .map_err(|e| WorkjamBackendError::HttpError(e))?
             .read_to_string(&mut s)?;
         Ok(s)
@@ -77,12 +78,13 @@ impl<C: WorkjamHttpClient> WorkjamClient<C> {
 }
 
 // trait can be public - inner methods will never be leaked because encapsulated in struct
-pub(crate) trait WorkjamHttpClient {
+pub trait WorkjamHttpClient {
     // impl Trait in trait method return types is permitted, however I want to enforce that *all* methods return the same type for consistency
     type Reader: std::io::Read; // no need for GAT because not doing massive downloads
     type Error: std::error::Error;
 
     fn set_cookie(&self, cookie: &str, uri: &'static str); // must be able to set a single persistent cookie once
     fn patch(&self, uri: &str, bearer_token: &str) -> Result<Self::Reader, Self::Error>; // this is all we need for patch, nothing more
-    fn get(&self, uri: &str) -> Result<Self::Reader, Self::Error>;
+    // fn get(&self, uri: &str) -> Result<Self::Reader, Self::Error>;
+    fn get(&self, uri: &str, header: (&str, &str)) -> Result<Self::Reader, Self::Error>;
 }

@@ -4,9 +4,9 @@ use serde::de::DeserializeOwned;
 
 use super::{
     RequestConfig, RequestPart, SerialiseRequestPart,
-    parameters::{NotifPara, QueryParameters},
-    parts::{Users, V3},
-    payload::{AuthRes, notifications::NotifRes},
+    parameters::{EventsPara, NotifPara, QueryParameters},
+    parts::{Employees, Users, V3},
+    payload::{AuthRes, events::EventRes, notifications::NotifRes},
 };
 
 pub trait Endpoint {
@@ -44,4 +44,5 @@ macro_rules! endpoint {
 }
 
 endpoint!(pub Notif, "notifications", Users, NotifRes, NotifPara);
-endpoint!(pub(crate) Auth, "", V3, AuthRes);
+endpoint!(pub Auth, "", V3, AuthRes);
+endpoint!(pub Events, "events", Employees, EventRes, EventsPara);

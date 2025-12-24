@@ -20,12 +20,12 @@ pub enum NotificationType {
 
 // ignored: deepLinkDTO, imageURL, refersTo, to (will always be me?)
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Notification {
     pub id: String,
     pub body: String,
     #[serde(rename = "type")]
     pub notif_type: NotificationType,
-    #[serde(rename = "unixTimeCreated")]
     pub unix_time_created: u64, // epoch time - can parse into a chrono::DateTime
 }
 

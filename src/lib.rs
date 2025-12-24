@@ -52,7 +52,7 @@ where
         self.backend().get(r.uri())
     }
 
-    pub fn get_request_raw<P: Endpoint>(&self, r: WorkjamRequest<P>) -> WorkjamResult<String, C> {
-        self.backend().get_raw(r.uri())
+    pub fn get_request_raw(&self, r: &str) -> WorkjamResult<String, C> {
+        self.backend().get_raw(r)
     }
 }

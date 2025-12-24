@@ -1,6 +1,10 @@
 // backend is fully pluggable
 
-use ureq::{self, BodyReader, Cookie, config::Config, http::{Uri, header::AUTHORIZATION}};
+use ureq::{
+    self, BodyReader, Cookie,
+    config::Config,
+    http::{Uri, header::AUTHORIZATION},
+};
 
 use super::WorkjamHttpClient;
 
@@ -43,7 +47,17 @@ impl WorkjamHttpClient for UreqWorkjamHttpClient {
             .into_reader())
     }
 
-    fn get(&self, uri: &str) -> Result<Self::Reader, Self::Error> {
-        Ok(self.a.get(uri).call()?.into_body().into_reader())
+    fn get(
+        &self,
+        uri: &str,
+        (header_name, header_val): (&str, &str),
+    ) -> Result<Self::Reader, Self::Error> {
+        Ok(self
+            .a
+            .get(uri)
+            .header(header_name, header_val)
+            .call()?
+            .into_body()
+            .into_reader())
     }
 }

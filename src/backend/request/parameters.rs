@@ -1,4 +1,5 @@
 use bon::Builder;
+use chrono::{DateTime, Local};
 use serde::Serialize;
 
 pub trait QueryParameters: Serialize {
@@ -20,3 +21,14 @@ pub struct NotifPara {
 }
 
 impl QueryParameters for NotifPara {}
+
+#[derive(Serialize, Builder)]
+#[serde(rename_all = "camelCase")]
+pub struct EventsPara {
+    #[builder(default = true)]
+    include_overlaps: bool,
+    end_date_time: DateTime<Local>,
+    start_date_time: DateTime<Local>,
+}
+
+impl QueryParameters for EventsPara {}
