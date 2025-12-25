@@ -48,7 +48,7 @@ where
             .auth_patch(WorkjamRequest::<Auth>::new(&()).uri())
     }
 
-    pub fn get_request<P: Endpoint>(&self, r: WorkjamRequest<P>) -> WorkjamResult<P::Res, C> {
+    pub fn get_request<P: Endpoint>(&self, r: &WorkjamRequest<P>) -> WorkjamResult<P::Res, C> {
         self.backend().get(r.uri())
     }
 

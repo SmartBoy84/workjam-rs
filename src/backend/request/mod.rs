@@ -11,7 +11,9 @@ use std::marker::PhantomData;
 use endpoints::{Endpoint, EndpointWithParameters};
 use parameters::QueryParameters;
 
-use crate::backend::request::{parts::Shifts, payload::events::EventData};
+use crate::backend::request::{
+    endpoints::EndpointWithNoPara, parts::Shifts, payload::events::EventData,
+};
 
 use super::ROOT;
 
@@ -67,7 +69,7 @@ pub struct WorkjamRequest<P: Endpoint> {
 }
 
 impl<E: Endpoint> WorkjamRequest<E> {
-    pub fn new<C: RequestConfig>(c: &C) -> Self
+    fn new_inner<C: RequestConfig>(c: &C) -> Self
     where
         E: SerialiseRequestPart<C>, // guaranteed, since I do SerialiseEndpoint: Endpoint
     {
@@ -80,13 +82,24 @@ impl<E: Endpoint> WorkjamRequest<E> {
             inner: PhantomData,
         }
     }
+}
 
+impl<E: Endpoint + EndpointWithNoPara> WorkjamRequest<E> {
+    pub fn new<C: RequestConfig>(c: &C) -> Self
+    where
+        E: SerialiseRequestPart<C>, // guaranteed, since I do SerialiseEndpoint: Endpoint
+    {
+        Self::new_inner(c)
+    }
+}
+
+impl<E: Endpoint + EndpointWithParameters> WorkjamRequest<E> {
     pub fn new_with_para<C>(c: &C, p: E::P) -> Self
     where
         C: RequestConfig,
-        E: EndpointWithParameters + SerialiseRequestPart<C>,
+        E: SerialiseRequestPart<C>,
     {
-        let mut s = Self::new(c);
+        let mut s = Self::new_inner(c);
         p.add_str(s.uri_mut());
         s
     }

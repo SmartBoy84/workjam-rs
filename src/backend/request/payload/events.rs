@@ -1,10 +1,13 @@
 use std::marker::PhantomData;
 
-use crate::backend::request::{
-    HasCompanyID, RequestConfig, WorkjamRequest, config::WorkjamRequestConfig, endpoints::Coworkers,
+use super::{
+    super::{
+        HasCompanyID, RequestConfig, WorkjamRequest, config::WorkjamRequestConfig,
+        endpoints::Coworkers,
+    },
+    Location,
 };
 
-use super::Location;
 use chrono::Local;
 use serde::Deserialize;
 

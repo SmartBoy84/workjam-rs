@@ -1,19 +1,8 @@
 use serde::Deserialize;
 
-#[derive(Deserialize)]
-pub struct Position {
-    pub id: String,
-    pub name: String,
-    // externalId, externalCode, sequence ignored
-}
+use crate::backend::request::payload::Position;
 
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Employee {
-    pub id: String,
-    pub first_name: String,
-    pub last_name: String,
-}
+use super::Employee;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]

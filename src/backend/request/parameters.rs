@@ -32,3 +32,30 @@ pub struct EventsPara {
 }
 
 impl QueryParameters for EventsPara {}
+
+#[derive(Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum EmployeeStatus {
+    Pending,
+    Active,
+    Inactive,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum EmployeeDetailsField {
+    CurrentEmployments,
+    PastEmployments,
+}
+
+#[derive(Serialize, Builder)]
+#[serde(rename_all = "camelCase")]
+pub struct EmployeesDetailsPara {
+    // sensible, consistent + what the backend uses when this field is absent
+    size: u32,
+    statuses: Option<Vec<EmployeeStatus>>,
+    extra_fields: Option<Vec<EmployeeDetailsField>>,
+    employee_ids: Option<Vec<String>>,
+}
+
+impl QueryParameters for EmployeesDetailsPara {}
