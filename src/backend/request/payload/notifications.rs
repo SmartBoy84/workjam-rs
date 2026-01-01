@@ -1,5 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+use crate::backend::request::{
+    HasCompanyID, HasEmployeeID, RequestConfig, WorkjamRequest, config::WorkjamRequestConfig,
+    endpoints::NotifRead,
+};
+
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 enum EntityType {
@@ -32,4 +37,18 @@ pub struct Notification {
 #[derive(Deserialize)]
 pub struct NotifRes {
     pub notifications: Vec<Notification>,
+}
+
+impl Notification {
+    pub fn set_read<C: RequestConfig + HasCompanyID + HasEmployeeID>(
+        &self,
+        c: &C,
+    ) -> WorkjamRequest<NotifRead> {
+        WorkjamRequest::new(
+            &WorkjamRequestConfig::new()
+                .company_id(c.company_id())
+                .employee_id(c.employee_id())
+                .notification_id(&self.id),
+        )
+    }
 }

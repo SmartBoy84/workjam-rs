@@ -6,7 +6,7 @@ So - WorkjamRequest::<Notifications>::new() - error: provide a config
 
 use std::borrow::Cow;
 
-use crate::backend::request::{HasShiftID, endpoints::Notif};
+use crate::backend::request::HasShiftID;
 
 use super::{HasCompanyID, HasEmployeeID, HasLocationID, HasNotificationID, RequestConfig};
 
@@ -20,7 +20,7 @@ pub struct NotificationID<'a>(Cow<'a, str>);
 #[derive(Default)]
 pub struct Unset;
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct WorkjamRequestConfig<A = Unset, B = Unset, C = Unset, D = Unset, E = Unset> {
     company_id: A,
     employee_id: B,
@@ -149,7 +149,7 @@ impl<A, B, C, E> HasShiftID for WorkjamRequestConfig<A, B, C, ShiftID<'_>, E> {
 }
 
 impl<A, B, C, D> WorkjamRequestConfig<A, B, C, D, Unset> {
-    fn notification_id<'a>(
+    pub fn notification_id<'a>(
         self,
         notification_id: impl Into<Cow<'a, str>>,
     ) -> WorkjamRequestConfig<A, B, C, D, NotificationID<'a>> {

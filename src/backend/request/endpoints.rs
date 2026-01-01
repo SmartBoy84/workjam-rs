@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use serde::de::DeserializeOwned;
 
-use crate::{GET, HttpMethod, PATCH, PUT};
+use crate::{GET, HttpMethod, PATCH, PUT, backend::request::parts::Notif};
 
 use super::{
     RequestConfig, RequestPart, SerialiseRequestPart,
@@ -78,11 +78,11 @@ endpoint!(pub EmployeeDetails, "", Employees, EmployeeDetailsRes);
 endpoint!(pub WorkingStatus, "working_status", Employees, WorkingStatusRes);
 endpoint!(pub Onsite, "on_site", Companies, OnsiteRes);
 endpoint!(pub Coworkers, "coworkers", Shifts, CoworkersRes);
-endpoint!(pub Notif, "notifications", Users, NotifRes, NotifPara);
+endpoint!(pub Notifs, "notifications", Users, NotifRes, NotifPara);
 endpoint!(pub Events, "events", Employees, EventsRes, EventsPara);
 
 // auth uses patch
 endpoint!(pub Auth, "", V3, AuthRes, method = PATCH);
 
 // notification READ uses put
-endpoint!(pub NotifRead, "", Notif, (), method = PUT);
+endpoint!(pub NotifRead, "READ", Notif, (), method = PUT); // note notif is a req part that extends from Notifs

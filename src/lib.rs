@@ -97,7 +97,7 @@ where
         P::Method::request(self.backend(), &r.uri())
     }
 
-    pub fn get_request_raw(&self, r: &str) -> WorkjamResult<String, C> {
+    pub fn request_raw(&self, r: &str) -> WorkjamResult<String, C> {
         self.backend().get_raw(r)
     }
 }

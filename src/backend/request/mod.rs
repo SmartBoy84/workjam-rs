@@ -11,9 +11,7 @@ use std::marker::PhantomData;
 use endpoints::{Endpoint, EndpointWithParameters};
 use parameters::QueryParameters;
 
-use crate::backend::request::{
-    endpoints::EndpointWithNoPara, parts::Shifts, payload::events::EventData,
-};
+use crate::backend::request::endpoints::EndpointWithNoPara;
 
 use super::ROOT;
 
@@ -27,8 +25,12 @@ pub trait SerialiseRequestPart<C: RequestConfig>: RequestPart {
 
     fn add_str(s: &mut String, config: &C) {
         <<Self as SerialiseRequestPart<C>>::Next>::add_str(s, config);
-        s.push('/');
-        s.push_str(<Self as SerialiseRequestPart<C>>::WORD);
+
+        // should get optimised away since WORD is const
+        if Self::WORD.len() > 0 {
+            s.push('/');
+            s.push_str(Self::WORD);
+        }
 
         // should get optimised away?
         if let Some(v) = Self::get_val(config) {
