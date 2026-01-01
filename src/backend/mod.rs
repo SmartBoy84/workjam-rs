@@ -27,21 +27,28 @@ type WorkjamBackendResult<O, C> = Result<O, WorkjamBackendError<<C as WorkjamHtt
 
 use serde::de::DeserializeOwned;
 
+use crate::RequestHandler;
+
 pub(super) struct WorkjamClient<T: WorkjamHttpClient> {
     inner: T,
     token: String, // token's not thaaat long to bother with lifetimes infesting code
 }
 
-impl<C: WorkjamHttpClient> WorkjamClient<C> {
-    pub(super) fn new(backend: C, token: &str) -> Self {
-        backend.set_cookie(&format!("{TOKEN_COOKIE}={token}"), ROOT);
-        Self {
-            inner: backend,
-            token: token.into(),
-        }
+impl<C: WorkjamHttpClient> RequestHandler for WorkjamClient<C> {
+    type E = WorkjamBackendError<C::Error>;
+
+    fn get<T>(&self, uri: &str) -> Result<T, Self::E>
+    where
+        T: DeserializeOwned,
+    {
+        Ok(serde_json::from_reader(
+            self.inner
+                .get(uri, (ACCEPT_LANGUAGE.as_str(), "*"))
+                .map_err(|e| WorkjamBackendError::HttpError(e))?,
+        )?)
     }
 
-    pub(super) fn auth_patch<T>(&self, uri: &str) -> WorkjamBackendResult<T, C>
+    fn patch<T>(&self, uri: &str) -> Result<T, Self::E>
     where
         T: DeserializeOwned,
     {
@@ -55,15 +62,26 @@ impl<C: WorkjamHttpClient> WorkjamClient<C> {
         )?)
     }
 
-    pub(super) fn get<T>(&self, uri: &str) -> WorkjamBackendResult<T, C>
+    fn put<T>(&self, uri: &str) -> Result<T, Self::E>
     where
         T: DeserializeOwned,
     {
+        // needed to set READ status on notification
         Ok(serde_json::from_reader(
             self.inner
-                .get(uri, (ACCEPT_LANGUAGE.as_str(), "*"))
+                .put(uri, &self.token)
                 .map_err(|e| WorkjamBackendError::HttpError(e))?,
         )?)
+    }
+}
+
+impl<C: WorkjamHttpClient> WorkjamClient<C> {
+    pub(super) fn new(backend: C, token: &str) -> Self {
+        backend.set_cookie(&format!("{TOKEN_COOKIE}={token}"), ROOT);
+        Self {
+            inner: backend,
+            token: token.into(),
+        }
     }
 
     pub(super) fn get_raw(&self, uri: &str) -> WorkjamBackendResult<String, C> {
@@ -86,4 +104,5 @@ pub trait WorkjamHttpClient {
     fn patch(&self, uri: &str, bearer_token: &str) -> Result<Self::Reader, Self::Error>; // this is all we need for patch, nothing more
     // fn get(&self, uri: &str) -> Result<Self::Reader, Self::Error>;
     fn get(&self, uri: &str, header: (&str, &str)) -> Result<Self::Reader, Self::Error>;
+    fn put(&self, uri: &str, bearer_token: &str) -> Result<Self::Reader, Self::Error>;
 }

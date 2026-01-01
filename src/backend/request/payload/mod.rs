@@ -23,7 +23,7 @@ pub struct WorkingStatusRes {
     pub is_working: bool,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Employee {
     pub id: String,
@@ -44,7 +44,7 @@ pub struct Position {
     // externalId, externalCode, sequence ignored
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Location {
     pub id: String,
@@ -54,7 +54,7 @@ pub struct Location {
     // externalCode, externalId, timeZoneId ignored
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum LocationType {
     Store,

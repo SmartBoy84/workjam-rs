@@ -8,6 +8,7 @@ use backend::{
     },
     ureq::UreqWorkjamHttpClient,
 };
+use serde::de::DeserializeOwned;
 
 type SelectedHttpClient = UreqWorkjamHttpClient;
 
@@ -18,6 +19,47 @@ pub enum WorkjamError<C: WorkjamHttpClient> {
 }
 
 type WorkjamResult<R, C> = Result<R, WorkjamBackendError<<C as WorkjamHttpClient>::Error>>;
+
+pub trait HttpMethod {
+    fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E>;
+}
+
+// pluggable backend
+pub struct PATCH;
+pub struct GET;
+pub struct PUT;
+
+impl HttpMethod for PATCH {
+    fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E> {
+        handler.patch(uri)
+    }
+}
+
+impl HttpMethod for GET {
+    fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E> {
+        handler.get(uri)
+    }
+}
+impl HttpMethod for PUT {
+    fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E> {
+        handler.put(uri)
+    }
+}
+
+pub trait RequestHandler {
+    type E: std::error::Error;
+    fn get<T>(&self, uri: &str) -> Result<T, Self::E>
+    where
+        T: DeserializeOwned;
+
+    fn patch<T>(&self, uri: &str) -> Result<T, Self::E>
+    where
+        T: DeserializeOwned;
+
+    fn put<T>(&self, uri: &str) -> Result<T, Self::E>
+    where
+        T: DeserializeOwned;
+}
 
 // default client impl is ureq
 pub struct WorkjamUser<C: WorkjamHttpClient = SelectedHttpClient> {
@@ -44,12 +86,15 @@ where
     }
 
     pub fn get_auth(&self) -> WorkjamResult<<Auth as Endpoint>::Res, C> {
-        self.backend()
-            .auth_patch(WorkjamRequest::<Auth>::new(&()).uri())
+        self.request(&WorkjamRequest::<Auth>::new(&()))
+        // self.backend().patch(WorkjamRequest::<Auth>::new(&()).uri())
     }
 
-    pub fn get_request<P: Endpoint>(&self, r: &WorkjamRequest<P>) -> WorkjamResult<P::Res, C> {
-        self.backend().get(r.uri())
+    pub fn request<P>(&self, r: &WorkjamRequest<P>) -> WorkjamResult<P::Res, C>
+    where
+        P: Endpoint,
+    {
+        P::Method::request(self.backend(), &r.uri())
     }
 
     pub fn get_request_raw(&self, r: &str) -> WorkjamResult<String, C> {

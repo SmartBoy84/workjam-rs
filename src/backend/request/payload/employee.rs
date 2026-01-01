@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use super::{Employee, Location, Position};
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Employment {
     pub position: Position,

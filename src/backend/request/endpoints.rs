@@ -2,6 +2,8 @@ use std::marker::PhantomData;
 
 use serde::de::DeserializeOwned;
 
+use crate::{GET, HttpMethod, PATCH, PUT};
+
 use super::{
     RequestConfig, RequestPart, SerialiseRequestPart,
     parameters::{EmployeesDetailsPara, EventsPara, NotifPara, QueryParameters},
@@ -16,6 +18,7 @@ use super::{
 };
 
 pub trait Endpoint {
+    type Method: HttpMethod;
     type Res: DeserializeOwned;
 }
 
@@ -25,10 +28,11 @@ pub trait EndpointWithParameters: Endpoint {
 }
 
 macro_rules! endpoint_common {
-    ($vis:vis $name:ident, $word:literal, $default:ty, $res:ty) => {
+    ($vis:vis $name:ident, $word:literal, $default:ty, $res:ty, $method:ty) => {
         $vis struct $name<T: RequestPart = $default>(PhantomData<T>);
 
         impl<T: RequestPart> Endpoint for $name<T> {
+            type Method = $method;
             type Res = $res;
         }
 
@@ -42,16 +46,26 @@ macro_rules! endpoint_common {
 }
 
 macro_rules! endpoint {
+    // No parameters, default GET
     ($vis:vis $name:ident, $word:literal, $default:ty, $res:ty) => {
-        endpoint_common!($vis $name, $word, $default, $res);
-
-        impl EndpointWithNoPara for $name {}
+        endpoint_common!($vis $name, $word, $default, $res, GET);
+        impl<T: RequestPart> EndpointWithNoPara for $name<T> {}
     };
-
-    // Endpoint with query parameters
+    // No parameters, explicit method
+    ($vis:vis $name:ident, $word:literal, $default:ty, $res:ty, method = $method:ty) => {
+        endpoint_common!($vis $name, $word, $default, $res, $method);
+        impl<T: RequestPart> EndpointWithNoPara for $name<T> {}
+    };
+    // With parameters, default GET
     ($vis:vis $name:ident, $word:literal, $default:ty, $res:ty, $params:ty) => {
-        endpoint_common!($vis $name, $word, $default, $res);
-
+        endpoint_common!($vis $name, $word, $default, $res, GET);
+        impl<T: RequestPart> EndpointWithParameters for $name<T> {
+            type P = $params;
+        }
+    };
+    // With parameters, explicit method
+    ($vis:vis $name:ident, $word:literal, $default:ty, $res:ty, $params:ty, method = $method:ty) => {
+        endpoint_common!($vis $name, $word, $default, $res, $method);
         impl<T: RequestPart> EndpointWithParameters for $name<T> {
             type P = $params;
         }
@@ -65,5 +79,10 @@ endpoint!(pub WorkingStatus, "working_status", Employees, WorkingStatusRes);
 endpoint!(pub Onsite, "on_site", Companies, OnsiteRes);
 endpoint!(pub Coworkers, "coworkers", Shifts, CoworkersRes);
 endpoint!(pub Notif, "notifications", Users, NotifRes, NotifPara);
-endpoint!(pub Auth, "", V3, AuthRes);
 endpoint!(pub Events, "events", Employees, EventsRes, EventsPara);
+
+// auth uses patch
+endpoint!(pub Auth, "", V3, AuthRes, method = PATCH);
+
+// notification READ uses put
+endpoint!(pub NotifRead, "", Notif, (), method = PUT);

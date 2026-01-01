@@ -57,6 +57,9 @@ pub trait HasLocationID: RequestConfig {
 pub trait HasShiftID: RequestConfig {
     fn shift_id(&self) -> &str;
 }
+pub trait HasNotificationID: RequestConfig {
+    fn notification_id(&self) -> &str;
+}
 
 impl RequestConfig for () {}
 
