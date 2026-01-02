@@ -56,11 +56,16 @@ pub trait HasCompanyID: RequestConfig {
 pub trait HasLocationID: RequestConfig {
     fn location_id(&self) -> &str;
 }
+
+// endpoint specific parameters
 pub trait HasShiftID: RequestConfig {
     fn shift_id(&self) -> &str;
 }
 pub trait HasNotificationID: RequestConfig {
     fn notification_id(&self) -> &str;
+}
+pub trait HasApprovalReqID: RequestConfig {
+    fn approval_req_id(&self) -> &str;
 }
 
 impl RequestConfig for () {}

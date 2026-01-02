@@ -2,7 +2,10 @@
 
 use std::marker::PhantomData;
 
-use crate::backend::request::{HasLocationID, HasNotificationID, HasShiftID, endpoints::Notifs};
+use crate::backend::request::{
+    HasApprovalReqID, HasLocationID, HasNotificationID, HasShiftID,
+    endpoints::{ApprovalReqs, Notifs},
+};
 
 use super::{HasCompanyID, HasEmployeeID, RequestConfig, RequestPart, SerialiseRequestPart};
 
@@ -37,8 +40,15 @@ macro_rules! request_part {
 // the defaults as set such that they include the most points possible
 // e.g., default of Companies is v4, because more require v4/Companies than v1/Companies
 
-// parts after endpoints
+// parts after endpoints - specific actions
 request_part!(Notif, "", Notifs, HasNotificationID, notification_id); // to handle things about a specific notification
+request_part!(
+    ApprovalReq,
+    "",
+    ApprovalReqs,
+    HasApprovalReqID,
+    approval_req_id
+); // to handle things about a specific approval req
 
 // standalone parts
 request_part!(Shifts, "shifts", Locations, HasShiftID, shift_id);

@@ -57,6 +57,16 @@ impl WorkjamHttpClient for UreqWorkjamHttpClient {
             .into_body()
             .into_reader())
     }
+    fn post(&self, uri: &str, bearer_token: &str) -> Result<Self::Reader, Self::Error> {
+        Ok(self
+            .a
+            .post(uri)
+            .header(AUTHORIZATION, bearer_token)
+            .content_type("application/json")
+            .send("{}")? // needed else 404
+            .into_body()
+            .into_reader())
+    }
 
     fn get(
         &self,

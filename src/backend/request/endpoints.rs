@@ -2,11 +2,13 @@ use std::marker::PhantomData;
 
 use serde::de::DeserializeOwned;
 
+use crate::backend::request::payload::approval_req::ApprovalReqRes;
+
 use super::{
-    super::super::{GET, HttpMethod, PATCH, PUT},
+    super::super::{GET, HttpMethod, PATCH, POST, PUT},
     RequestConfig, RequestPart, SerialiseRequestPart,
     parameters::{ApprovalReqPara, EmployeesDetailsPara, EventsPara, NotifPara, QueryParameters},
-    parts::{Companies, Employees, Notif, Shifts, Users, V3, V5},
+    parts::{ApprovalReq, Companies, Employees, Notif, Shifts, Users, V3, V5},
     payload::{
         AuthRes, OnsiteRes, WorkingStatusRes,
         approval_req::ApprovalReqsRes,
@@ -88,3 +90,6 @@ endpoint!(pub Auth, "", V3, AuthRes, method = PATCH);
 
 // notification READ uses put
 endpoint!(pub NotifRead, "READ", Notif, (), method = PUT); // note notif is a req part that extends from Notifs
+
+// approval request accept uses post
+endpoint!(pub AcceptApprovalReq, "accept", ApprovalReq, ApprovalReqRes, method = POST);

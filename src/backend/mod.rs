@@ -73,6 +73,18 @@ impl<C: WorkjamHttpClient> RequestHandler for WorkjamClient<C> {
                 .map_err(|e| WorkjamBackendError::HttpError(e))?,
         )?)
     }
+
+    fn post<T>(&self, uri: &str) -> Result<T, Self::E>
+    where
+        T: DeserializeOwned,
+    {
+        // needed to set READ status on notification
+        Ok(serde_json::from_reader(
+            self.inner
+                .post(uri, &self.token)
+                .map_err(|e| WorkjamBackendError::HttpError(e))?,
+        )?)
+    }
 }
 
 impl<C: WorkjamHttpClient> WorkjamClient<C> {
@@ -102,7 +114,7 @@ pub trait WorkjamHttpClient {
 
     fn set_cookie(&self, cookie: &str, uri: &'static str); // must be able to set a single persistent cookie once
     fn patch(&self, uri: &str, bearer_token: &str) -> Result<Self::Reader, Self::Error>; // this is all we need for patch, nothing more
-    // fn get(&self, uri: &str) -> Result<Self::Reader, Self::Error>;
     fn get(&self, uri: &str, header: (&str, &str)) -> Result<Self::Reader, Self::Error>;
     fn put(&self, uri: &str, bearer_token: &str) -> Result<Self::Reader, Self::Error>;
+    fn post(&self, uri: &str, bearer_token: &str) -> Result<Self::Reader, Self::Error>;
 }

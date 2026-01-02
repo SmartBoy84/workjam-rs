@@ -28,6 +28,7 @@ pub trait HttpMethod {
 pub struct PATCH;
 pub struct GET;
 pub struct PUT;
+pub struct POST;
 
 impl HttpMethod for PATCH {
     fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E> {
@@ -45,6 +46,11 @@ impl HttpMethod for PUT {
         handler.put(uri)
     }
 }
+impl HttpMethod for POST {
+    fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E> {
+        handler.post(uri)
+    }
+}
 
 pub trait RequestHandler {
     type E: std::error::Error;
@@ -57,6 +63,9 @@ pub trait RequestHandler {
         T: DeserializeOwned;
 
     fn put<T>(&self, uri: &str) -> Result<T, Self::E>
+    where
+        T: DeserializeOwned;
+    fn post<T>(&self, uri: &str) -> Result<T, Self::E>
     where
         T: DeserializeOwned;
 }

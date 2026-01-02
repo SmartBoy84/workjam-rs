@@ -1,7 +1,15 @@
 use chrono::Local;
 use serde::Deserialize;
 
-use super::{Employee, Location, Position};
+use crate::backend::request::{HasCompanyID, HasEmployeeID};
+
+use super::{
+    super::{
+        HasApprovalReqID, RequestConfig, WorkjamRequest, config::WorkjamRequestConfig,
+        endpoints::AcceptApprovalReq,
+    },
+    Employee, Location, Position,
+};
 
 #[derive(Deserialize, Debug)]
 pub enum ApprovalReqType {
@@ -17,42 +25,56 @@ pub enum ApprovalReqStatus {
     Approved,
     Expired,
     Canceled,
-    Pending
+    Pending,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ApprovalReqParticipant {
-    profile: Employee,
-    status: ApprovalReqStatus,
+    pub profile: Employee,
+    pub status: ApprovalReqStatus,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ApprovalReqDetails {
-    start_timestamp: chrono::DateTime<Local>,
-    end_timestamp: chrono::DateTime<Local>,
-    location: Location,
-    position: Position,
+    pub start_timestamp: chrono::DateTime<Local>,
+    pub end_timestamp: chrono::DateTime<Local>,
+    pub location: Location,
+    pub position: Position,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct ApprovalReq {
+pub struct ApprovalReqRes {
     // ignored displayStatus
-    id: String,
+    pub id: String,
     #[serde(rename = "type")]
-    req_type: ApprovalReqType,
-    status: ApprovalReqStatus,
-    request_date_time: chrono::NaiveDateTime, // for some reason this doesn't have timezone info
-    submission_timestamp: chrono::DateTime<Local>,
+    pub req_type: ApprovalReqType,
+    pub status: ApprovalReqStatus,
+    pub request_date_time: chrono::NaiveDateTime, // for some reason this doesn't have timezone info
+    pub submission_timestamp: chrono::DateTime<Local>,
     // sub-structs
-    initiator: ApprovalReqParticipant,
-    location: Location,
-    participants: Vec<ApprovalReqParticipant>,
-    request_details: ApprovalReqDetails,
+    pub initiator: ApprovalReqParticipant,
+    pub location: Location,
+    pub participants: Vec<ApprovalReqParticipant>,
+    pub request_details: ApprovalReqDetails,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(transparent)]
-pub struct ApprovalReqsRes(pub Vec<ApprovalReq>);
+pub struct ApprovalReqsRes(pub Vec<ApprovalReqRes>);
+
+impl ApprovalReqRes {
+    pub fn accept<C: RequestConfig + HasCompanyID + HasEmployeeID>(
+        &self,
+        c: &C,
+    ) -> WorkjamRequest<AcceptApprovalReq> {
+        WorkjamRequest::new(
+            &WorkjamRequestConfig::new()
+                .approval_req_id(&self.id)
+                .company_id(c.company_id())
+                .employee_id(c.employee_id()),
+        )
+    }
+}
