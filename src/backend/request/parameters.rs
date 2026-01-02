@@ -59,3 +59,41 @@ pub struct EmployeesDetailsPara {
 }
 
 impl QueryParameters for EmployeesDetailsPara {}
+
+#[derive(Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum ApprovalReqCatagory {
+    MyRequests,
+    Archived,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum SortBy {
+    RequestDateTime,
+    // probably others but eh
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum SortOrder {
+    Descending,
+    Ascending,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SortPara {
+    sort_by: SortBy,
+    sort_order: SortOrder,
+}
+
+#[derive(Serialize, Builder)]
+#[serde(rename_all = "camelCase")]
+pub struct ApprovalReqPara {
+    category: ApprovalReqCatagory,
+    #[serde(flatten)]
+    sort_para: Option<SortPara>,
+}
+
+impl QueryParameters for ApprovalReqPara {}

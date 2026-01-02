@@ -4,6 +4,7 @@ pub mod coworkers;
 pub mod employee;
 pub mod events;
 pub mod notifications;
+pub mod approval_req;
 
 #[derive(Debug, Deserialize)]
 pub struct AuthRes {

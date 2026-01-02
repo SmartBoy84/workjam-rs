@@ -87,7 +87,6 @@ where
 
     pub fn get_auth(&self) -> WorkjamResult<<Auth as Endpoint>::Res, C> {
         self.request(&WorkjamRequest::<Auth>::new(&()))
-        // self.backend().patch(WorkjamRequest::<Auth>::new(&()).uri())
     }
 
     pub fn request<P>(&self, r: &WorkjamRequest<P>) -> WorkjamResult<P::Res, C>

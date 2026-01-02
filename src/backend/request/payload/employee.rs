@@ -1,4 +1,3 @@
-use chrono::NaiveDate;
 use serde::Deserialize;
 
 use super::{Employee, Location, Position};

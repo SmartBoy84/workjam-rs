@@ -2,14 +2,14 @@ use std::marker::PhantomData;
 
 use serde::de::DeserializeOwned;
 
-use crate::{GET, HttpMethod, PATCH, PUT, backend::request::parts::Notif};
-
 use super::{
+    super::super::{GET, HttpMethod, PATCH, PUT},
     RequestConfig, RequestPart, SerialiseRequestPart,
-    parameters::{EmployeesDetailsPara, EventsPara, NotifPara, QueryParameters},
-    parts::{Companies, Employees, Shifts, Users, V3},
+    parameters::{ApprovalReqPara, EmployeesDetailsPara, EventsPara, NotifPara, QueryParameters},
+    parts::{Companies, Employees, Notif, Shifts, Users, V3, V5},
     payload::{
         AuthRes, OnsiteRes, WorkingStatusRes,
+        approval_req::ApprovalReqsRes,
         coworkers::CoworkersRes,
         employee::{EmployeeDetailsRes, EmployeesDetailsRes},
         events::EventsRes,
@@ -73,6 +73,8 @@ macro_rules! endpoint {
 }
 
 // endpoint!(pub ShiftDetail, "", Shifts, ShiftRes, ShiftPara) // Hella complicated (i.e., deep nesting) - can't be arsed
+// approval reqs needs V5, right now it's fine to manually specify it but overtime I will create a separate CompaniesV5 endpoint if a lot are like this
+endpoint!(pub ApprovalReqs, "approval_requests", Employees::<Companies::<V5>>, ApprovalReqsRes, ApprovalReqPara);
 endpoint!(pub EmployeesDetails, "employees", Companies, EmployeesDetailsRes, EmployeesDetailsPara);
 endpoint!(pub EmployeeDetails, "", Employees, EmployeeDetailsRes);
 endpoint!(pub WorkingStatus, "working_status", Employees, WorkingStatusRes);

@@ -58,10 +58,11 @@ request_part!(
     employee_id
 );
 request_part!(Companies, "companies", V4, HasCompanyID, company_id);
-request_part!(V1, "v1", ());
 request_part!(Auth, "auth", ());
+request_part!(V1, "v1", ());
 request_part!(V3, "v3", Auth);
 request_part!(V4, "v4", ());
+request_part!(V5, "v5", ());
 
 impl RequestPart for () {}
 
