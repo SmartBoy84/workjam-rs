@@ -14,6 +14,7 @@ use super::{
         approval_req::ApprovalReqsRes,
         coworkers::CoworkersRes,
         employee::{EmployeeDetailsRes, EmployeesDetailsRes},
+        shift::ShiftRes,
         events::EventsRes,
         notifications::NotifRes,
     },
@@ -74,8 +75,8 @@ macro_rules! endpoint {
     };
 }
 
-// endpoint!(pub ShiftDetail, "", Shifts, ShiftRes, ShiftPara) // Hella complicated (i.e., deep nesting) - can't be arsed
 // approval reqs needs V5, right now it's fine to manually specify it but overtime I will create a separate CompaniesV5 endpoint if a lot are like this
+endpoint!(pub ShiftDetail, "", Shifts, ShiftRes); // Hella complicated (i.e., deep nesting) - can't be arsed
 endpoint!(pub ApprovalReqs, "approval_requests", Employees::<Companies::<V5>>, ApprovalReqsRes, ApprovalReqPara);
 endpoint!(pub EmployeesDetails, "employees", Companies, EmployeesDetailsRes, EmployeesDetailsPara);
 endpoint!(pub EmployeeDetails, "", Employees, EmployeeDetailsRes);

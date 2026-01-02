@@ -5,6 +5,7 @@ pub mod employee;
 pub mod events;
 pub mod notifications;
 pub mod approval_req;
+pub mod shift;
 
 #[derive(Debug, Deserialize)]
 pub struct AuthRes {
@@ -52,6 +53,7 @@ pub struct Location {
     pub name: String,
     #[serde(rename = "type")]
     pub location_type: LocationType,
+    pub time_zone_id: String
     // externalCode, externalId, timeZoneId ignored
 }
 

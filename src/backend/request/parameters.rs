@@ -1,5 +1,5 @@
 use bon::Builder;
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Local, Utc};
 use serde::Serialize;
 
 pub trait QueryParameters: Serialize {

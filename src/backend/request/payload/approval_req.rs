@@ -53,12 +53,15 @@ pub struct ApprovalReqRes {
     pub req_type: ApprovalReqType,
     pub status: ApprovalReqStatus,
     pub request_date_time: chrono::NaiveDateTime, // for some reason this doesn't have timezone info
-    pub submission_timestamp: chrono::DateTime<Local>,
+
     // sub-structs
     pub initiator: ApprovalReqParticipant,
-    pub location: Location,
     pub participants: Vec<ApprovalReqParticipant>,
+
+    // some fields don't come up in the approvalRequests field for ShiftDetails
+    pub location: Location,
     pub request_details: ApprovalReqDetails,
+    pub submission_timestamp: chrono::DateTime<Local>,
 }
 
 #[derive(Deserialize, Debug)]
