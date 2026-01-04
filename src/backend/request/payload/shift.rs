@@ -29,10 +29,11 @@ pub struct ShiftApprovalReq {
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ShiftSegment {
+    #[serde(rename = "type")]
+    pub segment_type: ShiftSegmentType,
     pub start_date_time: chrono::DateTime<Local>,
     pub end_date_time: chrono::DateTime<Local>,
-    pub title: Option<String>,
-    pub note: Option<String>,
+    pub position: Position,
     pub location: Location,
 }
 
@@ -41,6 +42,13 @@ pub struct ShiftSegment {
 pub enum BreakType {
     Meal,
     // othwers?
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum ShiftSegmentType {
+    BreakMeal,
+    Shift, // othwers?
 }
 
 #[derive(Deserialize, Debug)]
@@ -62,12 +70,12 @@ pub struct Assignee {
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ShiftRes {
-    id: String,
-    event: EventData<events::Shift>,
-    assignees: Vec<Assignee>,
-    position: Position,
-    created_by: Employee,
-    segments: Vec<ShiftSegment>,
-    approval_requests: Vec<ShiftApprovalReq>,
+    pub id: String,
+    pub event: EventData<events::Shift>,
+    pub assignees: Vec<Assignee>,
+    pub position: Position,
+    pub created_by: Employee,
+    pub segments: Vec<ShiftSegment>,
+    pub approval_requests: Vec<ShiftApprovalReq>,
     // status, quantity, offeredSpots, openSpots, allowedActions, externalFields, locked, createViaIntegration
 }

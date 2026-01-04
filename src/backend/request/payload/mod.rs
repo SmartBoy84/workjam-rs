@@ -8,8 +8,9 @@ pub mod approval_req;
 pub mod shift;
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AuthRes {
-    pub userId: u64,
+    pub user_id: u64,
     pub employers: Vec<String>,
 }
 
