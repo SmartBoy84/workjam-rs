@@ -55,6 +55,7 @@ fn main() {
         .for_each(|notif| client.request(&notif.set_read(&my_config)).unwrap());
 }
 ```
+Find all the endpoints [here](https://github.com/SmartBoy84/workjam-rs/blob/main/src/backend/request/endpoints.rs).  
 ## Notes
 As per above, the user-facing interface for the crate is purposely simple:
 - Instantiate a `WorkjamUser` using your token
@@ -67,7 +68,7 @@ With how I've constructed this crate, at compile time every request is staticall
 
 If an endpoint requires specific parameters then the user is forced to instantiate with `new_with_para` and provide the correct paramter struct..  
 
-The Workjam API encodes certain config parameters in the API URL itself (e.g., `/api/v4/location/123-456-789/...)`. These details are provided in the `WorkjamRequestConfig` and using type states the user must provide an adequately qualified struct *at compile time*.  
+The Workjam API encodes certain parameters in the API URL itself (e.g., `/api/v4/location/123-456-789/...)`. These details are provided in the `WorkjamRequestConfig`. Using type-states the user is forced to provide an adequately qualified struct *at compile time*.  
 ### Pluggable thingamajigies!
 - In the crate I have provided the user with a backend powered by the `ureq` crate - this is the default, used when the user uses `.new()`
 - However, you can write your own backend, adhering to the `WorkjamHttpClient` trait and use `.new_with_backend()`
