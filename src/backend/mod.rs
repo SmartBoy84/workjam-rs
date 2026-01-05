@@ -37,51 +37,52 @@ pub(super) struct WorkjamClient<T: WorkjamHttpClient> {
 impl<C: WorkjamHttpClient> RequestHandler for WorkjamClient<C> {
     type E = WorkjamBackendError<C::Error>;
 
-    fn get<T>(&self, uri: &str) -> Result<T, Self::E>
+    fn get<T, P>(&self, r: &request::WorkjamRequest<P>) -> Result<T, Self::E>
     where
         T: DeserializeOwned,
+        P: request::endpoints::Endpoint,
     {
         Ok(serde_json::from_reader(
             self.inner
-                .get(uri, (ACCEPT_LANGUAGE.as_str(), "*"))
+                .get(r.uri(), (ACCEPT_LANGUAGE.as_str(), "*"))
                 .map_err(|e| WorkjamBackendError::HttpError(e))?,
         )?)
     }
 
-    fn patch<T>(&self, uri: &str) -> Result<T, Self::E>
+    fn patch<T, P>(&self, r: &request::WorkjamRequest<P>) -> Result<T, Self::E>
     where
         T: DeserializeOwned,
+        P: request::endpoints::Endpoint,
     {
-        /*
-        Workjam API has certain endpoints (only found Authorise so far) which requires a patch request with a bearer token to get
-         */
         Ok(serde_json::from_reader(
             self.inner
-                .patch(uri, &self.token)
+                .patch(r.uri(), &self.token)
                 .map_err(|e| WorkjamBackendError::HttpError(e))?,
         )?)
     }
 
-    fn put<T>(&self, uri: &str) -> Result<T, Self::E>
+    fn put<T, P>(&self, r: &request::WorkjamRequest<P>) -> Result<T, Self::E>
     where
         T: DeserializeOwned,
+        P: request::endpoints::Endpoint,
     {
         // needed to set READ status on notification
         Ok(serde_json::from_reader(
             self.inner
-                .put(uri, &self.token)
+                .put(r.uri(), &self.token)
                 .map_err(|e| WorkjamBackendError::HttpError(e))?,
         )?)
     }
 
-    fn post<T>(&self, uri: &str) -> Result<T, Self::E>
+    fn post<T, P>(&self, r: &request::WorkjamRequest<P>) -> Result<T, Self::E>
     where
         T: DeserializeOwned,
+        P: request::endpoints::Endpoint,
     {
         // needed to set READ status on notification
         Ok(serde_json::from_reader(
             self.inner
-                .post(uri, &self.token)
+                .post(r.uri(), &self.token)
                 .map_err(|e| WorkjamBackendError::HttpError(e))?,
         )?)
     }

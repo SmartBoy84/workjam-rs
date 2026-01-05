@@ -21,7 +21,10 @@ pub enum WorkjamError<C: WorkjamHttpClient> {
 type WorkjamResult<R, C> = Result<R, WorkjamBackendError<<C as WorkjamHttpClient>::Error>>;
 
 pub trait HttpMethod {
-    fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E>;
+    fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
+        handler: &H,
+        r: &WorkjamRequest<P>,
+    ) -> Result<T, H::E>;
 }
 
 // pluggable backend
@@ -31,43 +34,59 @@ pub struct PUT;
 pub struct POST;
 
 impl HttpMethod for PATCH {
-    fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E> {
-        handler.patch(uri)
+    fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
+        handler: &H,
+        r: &WorkjamRequest<P>,
+    ) -> Result<T, H::E> {
+        handler.patch(r)
     }
 }
 
 impl HttpMethod for GET {
-    fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E> {
-        handler.get(uri)
+    fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
+        handler: &H,
+        r: &WorkjamRequest<P>,
+    ) -> Result<T, H::E> {
+        handler.get(r)
     }
 }
 impl HttpMethod for PUT {
-    fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E> {
-        handler.put(uri)
+    fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
+        handler: &H,
+        r: &WorkjamRequest<P>,
+    ) -> Result<T, H::E> {
+        handler.put(r)
     }
 }
 impl HttpMethod for POST {
-    fn request<H: RequestHandler, T: DeserializeOwned>(handler: &H, uri: &str) -> Result<T, H::E> {
-        handler.post(uri)
+    fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
+        handler: &H,
+        r: &WorkjamRequest<P>,
+    ) -> Result<T, H::E> {
+        handler.post(r)
     }
 }
 
 pub trait RequestHandler {
     type E: std::error::Error;
-    fn get<T>(&self, uri: &str) -> Result<T, Self::E>
+    fn get<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
     where
-        T: DeserializeOwned;
+        T: DeserializeOwned,
+        P: Endpoint;
 
-    fn patch<T>(&self, uri: &str) -> Result<T, Self::E>
+    fn patch<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
     where
-        T: DeserializeOwned;
+        T: DeserializeOwned,
+        P: Endpoint;
 
-    fn put<T>(&self, uri: &str) -> Result<T, Self::E>
+    fn put<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
     where
-        T: DeserializeOwned;
-    fn post<T>(&self, uri: &str) -> Result<T, Self::E>
+        T: DeserializeOwned,
+        P: Endpoint;
+    fn post<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
     where
-        T: DeserializeOwned;
+        T: DeserializeOwned,
+        P: Endpoint;
 }
 
 // default client impl is ureq
@@ -102,7 +121,7 @@ where
     where
         P: Endpoint,
     {
-        P::Method::request(self.backend(), &r.uri())
+        P::Method::request(self.backend(), &r)
     }
 
     pub fn request_raw(&self, r: &str) -> WorkjamResult<String, C> {
