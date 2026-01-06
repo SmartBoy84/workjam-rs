@@ -1,10 +1,10 @@
 use chrono::Local;
 use serde::Deserialize;
 
-use super::{
+use crate::requests::{
     Employee, Location, Position,
-    approval_req::{ApprovalReqParticipant, ApprovalReqStatus, ApprovalReqType},
-    events::{self, EventData, Shift},
+    approval::{ApprovalReqParticipant, ApprovalReqStatus, ApprovalReqType},
+    events::{EventData, Shift},
 };
 
 // not using ApprovalReqRes because this doesn't have location, request_details, submission_timestamp
@@ -71,7 +71,7 @@ pub struct Assignee {
 #[serde(rename_all = "camelCase")]
 pub struct ShiftRes {
     pub id: String,
-    pub event: EventData<events::Shift>,
+    pub event: EventData<Shift>,
     pub assignees: Vec<Assignee>,
     pub position: Position,
     pub created_by: Employee,

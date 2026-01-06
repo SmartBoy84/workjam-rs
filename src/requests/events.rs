@@ -1,17 +1,10 @@
 use std::marker::PhantomData;
 
-use crate::backend::request::endpoints::ShiftDetail;
-
-use super::{
-    super::{
-        HasCompanyID, RequestConfig, WorkjamRequest, config::WorkjamRequestConfig,
-        endpoints::Coworkers,
-    },
-    Location,
-};
-
 use chrono::Local;
+use restman_rs::request::{ApiRequest, RequestConfig};
 use serde::Deserialize;
+
+use crate::{config::{HasCompanyID, WorkjamRequestConfig}, endpoints::{Coworkers, ShiftDetail}, requests::Location};
 
 pub trait EventType {}
 #[derive(Debug)]
@@ -50,8 +43,8 @@ pub enum Event {
 pub struct EventsRes(pub Vec<Event>);
 
 impl EventData<Shift> {
-    pub fn coworkers<C: RequestConfig + HasCompanyID>(&self, c: &C) -> WorkjamRequest<Coworkers> {
-        WorkjamRequest::new(
+    pub fn coworkers<C: RequestConfig + HasCompanyID>(&self, c: &C) -> ApiRequest<Coworkers> {
+        ApiRequest::new(
             &WorkjamRequestConfig::new()
                 .shift_id(&self.id)
                 .location_id(&self.location.id)
@@ -59,8 +52,8 @@ impl EventData<Shift> {
         )
     }
 
-    pub fn details<C: RequestConfig + HasCompanyID>(&self, c: &C) -> WorkjamRequest<ShiftDetail> {
-        WorkjamRequest::new(
+    pub fn details<C: RequestConfig + HasCompanyID>(&self, c: &C) -> ApiRequest<ShiftDetail> {
+        ApiRequest::new(
             &WorkjamRequestConfig::new()
                 .shift_id(&self.id)
                 .location_id(&self.location.id)

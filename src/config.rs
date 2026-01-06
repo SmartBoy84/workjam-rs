@@ -6,11 +6,28 @@ So - WorkjamRequest::<Notifications>::new() - error: provide a config
 
 use std::borrow::Cow;
 
-use crate::backend::request::HasShiftID;
+use restman_rs::request::RequestConfig;
 
-use super::{
-    HasApprovalReqID, HasCompanyID, HasEmployeeID, HasLocationID, HasNotificationID, RequestConfig,
-};
+pub trait HasEmployeeID: RequestConfig {
+    fn employee_id(&self) -> &str;
+}
+pub trait HasCompanyID: RequestConfig {
+    fn company_id(&self) -> &str;
+}
+pub trait HasLocationID: RequestConfig {
+    fn location_id(&self) -> &str;
+}
+
+// endpoint specific parameters
+pub trait HasShiftID: RequestConfig {
+    fn shift_id(&self) -> &str;
+}
+pub trait HasNotificationID: RequestConfig {
+    fn notification_id(&self) -> &str;
+}
+pub trait HasApprovalReqID: RequestConfig {
+    fn approval_req_id(&self) -> &str;
+}
 
 // with Cow I can create cheap one-time configs using &str, or configs which own the data (so I don't have to think about the data being in two places)
 pub struct CompanyID<'a>(Cow<'a, str>);

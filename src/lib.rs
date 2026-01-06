@@ -1,97 +1,37 @@
-pub mod backend;
+pub mod config;
+pub mod endpoints;
+pub mod parameters;
+pub mod parts;
+pub mod requests;
 
-use backend::{
-    AGENT, WorkjamBackendError, WorkjamClient, WorkjamHttpClient,
-    request::{
-        WorkjamRequest,
-        endpoints::{Auth, Endpoint},
-    },
-    ureq::UreqWorkjamHttpClient,
+pub use restman_rs::request as request;
+
+use restman_rs::{
+    HttpMethod, Server,
+    client::{AGENT, ApiBackendError, ApiClient, ApiHttpClient},
+    request::{ApiRequest, endpoints::Endpoint},
+    ureq::UreqApiHttpClient,
 };
-use serde::de::DeserializeOwned;
 
-use crate::backend::WorkjamBackendResult;
+use crate::endpoints::Auth;
 
-type SelectedHttpClient = UreqWorkjamHttpClient;
+pub struct Workjam;
+impl Server for Workjam {
+    const ROOT: &str = "https://api.workjam.com/api/";
+}
+
+type SelectedHttpClient = UreqApiHttpClient;
+type WorkjamBackendResult<T, C> = Result<T, ApiBackendError<<C as ApiHttpClient>::Error>>;
 
 #[derive(thiserror::Error, Debug)]
-pub enum WorkjamError<C: WorkjamHttpClient> {
+pub enum WorkjamError<C: ApiHttpClient> {
     #[error("backend error")]
-    BackendError(#[from] WorkjamBackendError<C::Error>),
-}
-
-pub trait HttpMethod {
-    fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
-        handler: &H,
-        r: &WorkjamRequest<P>,
-    ) -> Result<T, H::E>;
-}
-
-// pluggable backend
-pub struct PATCH;
-pub struct GET;
-pub struct PUT;
-pub struct POST;
-
-impl HttpMethod for PATCH {
-    fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
-        handler: &H,
-        r: &WorkjamRequest<P>,
-    ) -> Result<T, H::E> {
-        handler.patch(r)
-    }
-}
-
-impl HttpMethod for GET {
-    fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
-        handler: &H,
-        r: &WorkjamRequest<P>,
-    ) -> Result<T, H::E> {
-        handler.get(r)
-    }
-}
-impl HttpMethod for PUT {
-    fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
-        handler: &H,
-        r: &WorkjamRequest<P>,
-    ) -> Result<T, H::E> {
-        handler.put(r)
-    }
-}
-impl HttpMethod for POST {
-    fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
-        handler: &H,
-        r: &WorkjamRequest<P>,
-    ) -> Result<T, H::E> {
-        handler.post(r)
-    }
-}
-
-pub trait RequestHandler {
-    type E: std::error::Error;
-    fn get<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
-    where
-        T: DeserializeOwned,
-        P: Endpoint;
-
-    fn patch<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
-    where
-        T: DeserializeOwned,
-        P: Endpoint;
-
-    fn put<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
-    where
-        T: DeserializeOwned,
-        P: Endpoint;
-    fn post<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
-    where
-        T: DeserializeOwned,
-        P: Endpoint;
+    BackendError(#[from] ApiBackendError<C::Error>),
 }
 
 // default client impl is ureq
-pub struct WorkjamUser<C: WorkjamHttpClient = SelectedHttpClient> {
-    backend: WorkjamClient<C>,
+pub struct WorkjamUser<C: ApiHttpClient = SelectedHttpClient> {
+    backend: ApiClient<C>,
 }
 
 impl WorkjamUser {
@@ -102,24 +42,24 @@ impl WorkjamUser {
 
 impl<C> WorkjamUser<C>
 where
-    C: WorkjamHttpClient,
+    C: ApiHttpClient,
 {
     pub fn new_with_backend(backend: C, token: &str) -> Self {
-        let backend = WorkjamClient::new(backend, token);
+        let backend = ApiClient::new(backend, token);
         Self { backend }
     }
 
-    fn backend(&self) -> &WorkjamClient<C> {
+    fn backend(&self) -> &ApiClient<C> {
         &self.backend
     }
 
     pub fn get_auth(&self) -> WorkjamBackendResult<<Auth as Endpoint>::Res, C> {
-        self.request(&WorkjamRequest::<Auth>::new(&()))
+        self.request(&ApiRequest::<Auth>::new(&()))
     }
 
-    pub fn request<P>(&self, r: &WorkjamRequest<P>) -> WorkjamBackendResult<P::Res, C>
+    pub fn request<P>(&self, r: &ApiRequest<P>) -> WorkjamBackendResult<P::Res, C>
     where
-        P: Endpoint,
+        P: Endpoint<Ser = Workjam>, // enforce that Server of the request is Workjam since using helper library
     {
         self.backend().request(r)
     }

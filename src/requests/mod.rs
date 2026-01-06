@@ -4,7 +4,7 @@ pub mod coworkers;
 pub mod employee;
 pub mod events;
 pub mod notifications;
-pub mod approval_req;
+pub mod approval;
 pub mod shift;
 
 #[derive(Debug, Deserialize)]

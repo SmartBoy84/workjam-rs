@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::backend::request::payload::Position;
+use crate::requests::Position;
 
 use super::Employee;
 

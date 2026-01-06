@@ -1,7 +1,8 @@
+use restman_rs::request::{ApiRequest, RequestConfig};
 use serde::{Deserialize, Serialize};
 
-use crate::backend::request::{
-    HasCompanyID, HasEmployeeID, RequestConfig, WorkjamRequest, config::WorkjamRequestConfig,
+use crate::{
+    config::{HasCompanyID, HasEmployeeID, WorkjamRequestConfig},
     endpoints::NotifRead,
 };
 
@@ -43,8 +44,8 @@ impl Notification {
     pub fn set_read<C: RequestConfig + HasCompanyID + HasEmployeeID>(
         &self,
         c: &C,
-    ) -> WorkjamRequest<NotifRead> {
-        WorkjamRequest::new(
+    ) -> ApiRequest<NotifRead> {
+        ApiRequest::new(
             &WorkjamRequestConfig::new()
                 .company_id(c.company_id())
                 .employee_id(c.employee_id())

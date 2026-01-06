@@ -1,14 +1,11 @@
 use chrono::Local;
+use restman_rs::request::{ApiRequest, RequestConfig};
 use serde::Deserialize;
 
-use crate::backend::request::{HasCompanyID, HasEmployeeID};
-
-use super::{
-    super::{
-        HasApprovalReqID, RequestConfig, WorkjamRequest, config::WorkjamRequestConfig,
-        endpoints::AcceptApprovalReq,
-    },
-    Employee, Location, Position,
+use crate::{
+    config::{HasCompanyID, HasEmployeeID, WorkjamRequestConfig},
+    endpoints::AcceptApprovalReq,
+    requests::{Employee, Location, Position},
 };
 
 #[derive(Deserialize, Debug)]
@@ -72,8 +69,8 @@ impl ApprovalReqRes {
     pub fn accept<C: RequestConfig + HasCompanyID + HasEmployeeID>(
         &self,
         c: &C,
-    ) -> WorkjamRequest<AcceptApprovalReq> {
-        WorkjamRequest::new(
+    ) -> ApiRequest<AcceptApprovalReq> {
+        ApiRequest::new(
             &WorkjamRequestConfig::new()
                 .approval_req_id(&self.id)
                 .company_id(c.company_id())
