@@ -101,7 +101,7 @@ impl<C: WorkjamHttpClient> RequestHandler for WorkjamClient<C> {
 
 impl<C: WorkjamHttpClient> WorkjamClient<C> {
     pub(super) fn new(backend: C, token: &str) -> Self {
-        // backend.set_cookie(&format!("{TOKEN_COOKIE}={token}"), ROOT);
+        backend.set_cookie(&format!("{TOKEN_COOKIE}={token}"), ROOT);
         Self {
             inner: backend,
             token: token.into(),
