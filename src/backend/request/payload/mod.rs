@@ -20,7 +20,7 @@ pub struct OnsiteRes {
     pub on_site: bool, // valid geofences crap ignored
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct WorkingStatusRes {
     #[serde(rename = "employeeWorking")]
     pub is_working: bool,

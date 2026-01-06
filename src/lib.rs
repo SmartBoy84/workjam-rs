@@ -10,6 +10,8 @@ use backend::{
 };
 use serde::de::DeserializeOwned;
 
+use crate::backend::WorkjamBackendResult;
+
 type SelectedHttpClient = UreqWorkjamHttpClient;
 
 #[derive(thiserror::Error, Debug)]
@@ -17,8 +19,6 @@ pub enum WorkjamError<C: WorkjamHttpClient> {
     #[error("backend error")]
     BackendError(#[from] WorkjamBackendError<C::Error>),
 }
-
-type WorkjamResult<R, C> = Result<R, WorkjamBackendError<<C as WorkjamHttpClient>::Error>>;
 
 pub trait HttpMethod {
     fn request<H: RequestHandler, T: DeserializeOwned, P: Endpoint>(
@@ -113,18 +113,18 @@ where
         &self.backend
     }
 
-    pub fn get_auth(&self) -> WorkjamResult<<Auth as Endpoint>::Res, C> {
+    pub fn get_auth(&self) -> WorkjamBackendResult<<Auth as Endpoint>::Res, C> {
         self.request(&WorkjamRequest::<Auth>::new(&()))
     }
 
-    pub fn request<P>(&self, r: &WorkjamRequest<P>) -> WorkjamResult<P::Res, C>
+    pub fn request<P>(&self, r: &WorkjamRequest<P>) -> WorkjamBackendResult<P::Res, C>
     where
         P: Endpoint,
     {
-        P::Method::request(self.backend(), &r)
+        self.backend().request(r)
     }
 
-    pub fn request_raw(&self, r: &str) -> WorkjamResult<String, C> {
+    pub fn request_raw(&self, r: &str) -> WorkjamBackendResult<String, C> {
         self.backend().get_raw(r)
     }
 }

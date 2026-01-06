@@ -1,6 +1,11 @@
 pub mod request;
 pub(super) mod ureq;
 
+use super::{HttpMethod, RequestHandler};
+use crate::backend::request::{WorkjamRequest, endpoints::Endpoint};
+
+use serde::de::DeserializeOwned;
+
 use std::io::{self, Read};
 
 use http::header::ACCEPT_LANGUAGE;
@@ -23,15 +28,21 @@ pub enum WorkjamBackendError<E: std::error::Error> {
     ReadError(#[from] io::Error),
 }
 
-type WorkjamBackendResult<O, C> = Result<O, WorkjamBackendError<<C as WorkjamHttpClient>::Error>>;
-
-use serde::de::DeserializeOwned;
-
-use crate::RequestHandler;
+pub type WorkjamBackendResult<O, C> =
+    Result<O, WorkjamBackendError<<C as WorkjamHttpClient>::Error>>;
 
 pub(super) struct WorkjamClient<T: WorkjamHttpClient> {
     inner: T,
     token: String, // token's not thaaat long to bother with lifetimes infesting code
+}
+
+impl<C: WorkjamHttpClient> WorkjamClient<C> {
+    pub fn request<P>(&self, r: &WorkjamRequest<P>) -> WorkjamBackendResult<P::Res, C>
+    where
+        P: Endpoint,
+    {
+        P::Method::request(self, &r)
+    }
 }
 
 impl<C: WorkjamHttpClient> RequestHandler for WorkjamClient<C> {
@@ -44,12 +55,12 @@ impl<C: WorkjamHttpClient> RequestHandler for WorkjamClient<C> {
     {
         Ok(serde_json::from_reader(
             self.inner
-                .get(r.uri(), (ACCEPT_LANGUAGE.as_str(), "*"))
+                .get(r.uri(), &self.token, (ACCEPT_LANGUAGE.as_str(), "*"))
                 .map_err(|e| WorkjamBackendError::HttpError(e))?,
         )?)
     }
 
-    fn patch<T, P>(&self, r: &request::WorkjamRequest<P>) -> Result<T, Self::E>
+    fn patch<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
     where
         T: DeserializeOwned,
         P: request::endpoints::Endpoint,
@@ -61,7 +72,7 @@ impl<C: WorkjamHttpClient> RequestHandler for WorkjamClient<C> {
         )?)
     }
 
-    fn put<T, P>(&self, r: &request::WorkjamRequest<P>) -> Result<T, Self::E>
+    fn put<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
     where
         T: DeserializeOwned,
         P: request::endpoints::Endpoint,
@@ -74,7 +85,7 @@ impl<C: WorkjamHttpClient> RequestHandler for WorkjamClient<C> {
         )?)
     }
 
-    fn post<T, P>(&self, r: &request::WorkjamRequest<P>) -> Result<T, Self::E>
+    fn post<T, P>(&self, r: &WorkjamRequest<P>) -> Result<T, Self::E>
     where
         T: DeserializeOwned,
         P: request::endpoints::Endpoint,
@@ -90,7 +101,7 @@ impl<C: WorkjamHttpClient> RequestHandler for WorkjamClient<C> {
 
 impl<C: WorkjamHttpClient> WorkjamClient<C> {
     pub(super) fn new(backend: C, token: &str) -> Self {
-        backend.set_cookie(&format!("{TOKEN_COOKIE}={token}"), ROOT);
+        // backend.set_cookie(&format!("{TOKEN_COOKIE}={token}"), ROOT);
         Self {
             inner: backend,
             token: token.into(),
@@ -100,7 +111,7 @@ impl<C: WorkjamHttpClient> WorkjamClient<C> {
     pub(super) fn get_raw(&self, uri: &str) -> WorkjamBackendResult<String, C> {
         let mut s = String::new();
         self.inner
-            .get(uri, (ACCEPT_LANGUAGE.as_str(), "*"))
+            .get(uri, &self.token, (ACCEPT_LANGUAGE.as_str(), "*"))
             .map_err(|e| WorkjamBackendError::HttpError(e))?
             .read_to_string(&mut s)?;
         Ok(s)
@@ -115,7 +126,12 @@ pub trait WorkjamHttpClient {
 
     fn set_cookie(&self, cookie: &str, uri: &'static str); // must be able to set a single persistent cookie once
     fn patch(&self, uri: &str, bearer_token: &str) -> Result<Self::Reader, Self::Error>; // this is all we need for patch, nothing more
-    fn get(&self, uri: &str, header: (&str, &str)) -> Result<Self::Reader, Self::Error>;
+    fn get(
+        &self,
+        uri: &str,
+        bearer_token: &str,
+        header: (&str, &str),
+    ) -> Result<Self::Reader, Self::Error>;
     fn put(&self, uri: &str, bearer_token: &str) -> Result<Self::Reader, Self::Error>;
     fn post(&self, uri: &str, bearer_token: &str) -> Result<Self::Reader, Self::Error>;
 }

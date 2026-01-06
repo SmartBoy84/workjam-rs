@@ -34,7 +34,7 @@ pub struct Notification {
     pub unix_time_created: u64, // epoch time - can parse into a chrono::DateTime
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct NotifRes {
     pub notifications: Vec<Notification>,
 }

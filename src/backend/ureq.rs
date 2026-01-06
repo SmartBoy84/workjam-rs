@@ -71,12 +71,14 @@ impl WorkjamHttpClient for UreqWorkjamHttpClient {
     fn get(
         &self,
         uri: &str,
+        bearer_token: &str,
         (header_name, header_val): (&str, &str),
     ) -> Result<Self::Reader, Self::Error> {
         Ok(self
             .a
             .get(uri)
             .header(header_name, header_val)
+            .header(AUTHORIZATION, bearer_token)
             .call()?
             .into_body()
             .into_reader())

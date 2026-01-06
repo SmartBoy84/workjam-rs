@@ -23,6 +23,7 @@ pub trait SerialiseRequestPart<C: RequestConfig>: RequestPart {
         None
     }
 
+    // Wish I could make this const but config parameters in the URL makes that impossible
     fn add_str(s: &mut String, config: &C) {
         <<Self as SerialiseRequestPart<C>>::Next>::add_str(s, config);
 

@@ -93,4 +93,4 @@ endpoint!(pub Auth, "", V3, AuthRes, method = PATCH);
 endpoint!(pub NotifRead, "READ", Notif, (), method = PUT); // note notif is a req part that extends from Notifs
 
 // approval request accept uses post
-endpoint!(pub AcceptApprovalReq, "accept", ApprovalReq, ApprovalReqRes, method = POST);
+endpoint!(pub AcceptApprovalReq, "accept", ApprovalReq, ShiftRes, method = POST);
