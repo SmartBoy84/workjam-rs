@@ -55,7 +55,7 @@ fn main() {
         .for_each(|notif| client.request(&notif.set_read(&my_config)).unwrap());
 }
 ```
-Find all the endpoints [here](https://github.com/SmartBoy84/workjam-rs/blob/main/src/backend/request/endpoints.rs).  
+Find all the endpoints [here](https://github.com/SmartBoy84/workjam-rs/blob/main/src/endpoints.rs).  
 ## Notes
 As per above, the user-facing interface for the crate is purposely simple:
 - Instantiate a `WorkjamUser` using your token
