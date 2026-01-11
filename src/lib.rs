@@ -9,8 +9,8 @@ use std::marker::PhantomData;
 pub use restman_rs::request;
 
 use restman_rs::{
-    Server,
-    client::{AGENT, ApiBackendError, ApiClient, ApiHttpClient},
+    ApiBackendError, ApiBackendResult, ApiHttpClient, MethodMarkerGetter, Server,
+    client::{AGENT, ApiClient},
     request::{ApiRequest, endpoints::Endpoint},
     ureq::UreqApiHttpClient,
 };
@@ -25,12 +25,11 @@ impl Server for Workjam {
 }
 
 type SelectedHttpClient = UreqApiHttpClient;
-type WorkjamBackendResult<T, C> = Result<T, ApiBackendError<<C as ApiHttpClient>::Error>>;
 
 #[derive(thiserror::Error, Debug)]
 pub enum WorkjamError<C: ApiHttpClient> {
     #[error("backend error")]
-    BackendError(#[from] ApiBackendError<C::Error>),
+    BackendError(#[from] ApiBackendError<C>),
 }
 
 // default client impl is ureq
@@ -72,22 +71,27 @@ where
         &self.backend
     }
 
-    pub fn get_auth(&self) -> WorkjamBackendResult<<Auth as Endpoint>::Res, C>
+    pub fn get_auth(&self) -> ApiBackendResult<<Auth as Endpoint>::Res, C>
     where
-        Auth: Endpoint<Ser = S>,
+        Auth: Endpoint<Ser = S, Method: MethodMarkerGetter<C>>,
     {
         self.request(&ApiRequest::<Auth>::new(&()))
     }
 
     // note; have to enforce Ser because token cookie is set to workjam
-    pub fn request<P>(&self, r: &ApiRequest<P>) -> WorkjamBackendResult<P::Res, C>
+    pub fn request<P>(&self, r: &ApiRequest<P>) -> ApiBackendResult<P::Res, C>
     where
         P: Endpoint<Ser = S>, // enforce that Server of the request is Workjam since using helper library
+        P::Method: MethodMarkerGetter<C>,
     {
         self.backend().request(r)
     }
 
-    pub fn request_raw(&self, r: &str) -> WorkjamBackendResult<String, C> {
-        self.backend().get_raw(r)
+    pub fn raw_request<P>(&self, r: &ApiRequest<P>) -> ApiBackendResult<String, C>
+    where
+        P: Endpoint<Ser = S>, // enforce that Server of the request is Workjam since using helper library
+        P::Method: MethodMarkerGetter<C>,
+    {
+        self.backend().raw_request(r)
     }
 }

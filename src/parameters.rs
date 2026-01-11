@@ -1,5 +1,5 @@
 use bon::Builder;
-use chrono::{DateTime, Local, Utc};
+use chrono::{DateTime, Local};
 use restman_rs::request::QueryParameters;
 use serde::Serialize;
 
