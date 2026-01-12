@@ -10,14 +10,11 @@ As this API is reverse-engineered, Workjam does not provide an easy method of ob
 ```rust
 use workjam_rs::{
     WorkjamUser,
-    backend::request::{
-        WorkjamRequest,
-        config::WorkjamRequestConfig,
-        endpoints,
-        parameters::NotifPara,
-        payload::{AuthRes, notifications::NotifRes},
-    },
-};
+    config::WorkjamRequestConfig,
+    endpoints,
+    parameters::NotifPara,
+    requests::{AuthRes, notifications::NotifRes},
+},
 
 const TOKEN: &str = "{bearer token}";
 
@@ -34,7 +31,7 @@ fn main() {
         .company_id(my_employer)
         .employee_id(&my_id); // Uses `Cow<'a, str>` under the hood so can borrow or own
 
-    let notifs_req = WorkjamRequest::<endpoints::Notifs>::new_with_para(
+    let notifs_req = ApiRequest::<endpoints::Notifs>::new_with_para(
         &my_config,
         NotifPara::builder().offset(0).size(100).build(),
     );

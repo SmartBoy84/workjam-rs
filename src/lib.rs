@@ -6,13 +6,10 @@ pub mod requests;
 
 use std::marker::PhantomData;
 
-pub use restman_rs::request;
+pub use restman_rs::request::ApiRequest;
 
 use restman_rs::{
-    ApiBackendError, ApiBackendResult, ApiHttpClient, MethodMarkerGetter, Server,
-    client::{AGENT, ApiClient},
-    request::{ApiRequest, endpoints::Endpoint},
-    ureq::UreqApiHttpClient,
+    ApiBackendError, ApiBackendResult, ApiHttpClient, ConstServer, MethodMarkerGetter, Server, client::{AGENT, ApiClient}, request::endpoints::Endpoint, ureq::UreqApiHttpClient
 };
 
 use crate::endpoints::Auth;
@@ -20,7 +17,8 @@ use crate::endpoints::Auth;
 const TOKEN_COOKIE: &str = "token";
 
 pub struct Workjam;
-impl Server for Workjam {
+impl Server for Workjam {}
+impl ConstServer for Workjam {
     const ROOT: &str = "https://api.workjam.com/api";
 }
 
@@ -56,7 +54,7 @@ where
 impl<C, S> WorkjamUser<C, S>
 where
     C: ApiHttpClient,
-    S: Server,
+    S: ConstServer,
 {
     fn inner_new_with_backend(backend: C, token: &str) -> Self {
         backend.set_cookie(&format!("{TOKEN_COOKIE}={token}"), S::ROOT);
