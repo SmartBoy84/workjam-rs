@@ -3,3 +3,6 @@ writeup.md
 target
 Cargo.lock
 todo.md
+
+# I use local path to restman-rs
+Cargo.toml
