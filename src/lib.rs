@@ -9,7 +9,10 @@ use std::marker::PhantomData;
 pub use restman_rs::request::ApiRequest;
 
 use restman_rs::{
-    ApiBackendError, ApiBackendResult, ApiHttpClient, ConstServer, MethodMarkerGetter, Server, client::{AGENT, ApiClient}, request::endpoints::Endpoint, ureq::UreqApiHttpClient
+    ApiBackendError, ApiBackendResult, ApiHttpClient, ConstServer, MethodMarkerGetter, Server,
+    client::{AGENT, ApiClient},
+    request::{ValidRequest, endpoints::Endpoint},
+    ureq::UreqApiHttpClient,
 };
 
 use crate::endpoints::Auth;
@@ -77,19 +80,20 @@ where
     }
 
     // note; have to enforce Ser because token cookie is set to workjam
-    pub fn request<P>(&self, r: &ApiRequest<P>) -> ApiBackendResult<P::Res, C>
+    pub fn request<P, R>(&self, r: &R) -> ApiBackendResult<P::Res, C>
     where
         P: Endpoint<Ser = S>, // enforce that Server of the request is Workjam since using helper library
+        R: ValidRequest<P>,
         P::Method: MethodMarkerGetter<C>,
     {
         self.backend().request(r)
     }
 
-    pub fn raw_request<P>(&self, r: &ApiRequest<P>) -> ApiBackendResult<String, C>
-    where
-        P: Endpoint<Ser = S>, // enforce that Server of the request is Workjam since using helper library
-        P::Method: MethodMarkerGetter<C>,
-    {
-        self.backend().raw_request(r)
-    }
+    // pub fn raw_request<P>(&self, r: &ApiRequest<P>) -> ApiBackendResult<String, C>
+    // where
+    //     P: Endpoint<Ser = S>, // enforce that Server of the request is Workjam since using helper library
+    //     P::Method: MethodMarkerGetter<C>,
+    // {
+    //     self.backend().raw_request(r)
+    // }
 }

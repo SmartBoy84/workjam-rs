@@ -1,6 +1,6 @@
 use bon::Builder;
 use chrono::{DateTime, Local};
-use restman_rs::request::QueryParameters;
+use restman_rs::request::{QueryParameters, QueryParametersOptional};
 use serde::Serialize;
 
 #[derive(Serialize, Builder)]

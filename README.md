@@ -1,5 +1,5 @@
 # Workjam-rs
-> Rust bindings for the \(reverse engineered) [Workjam](https://workjam.com) shift management REST API   
+> Rust bindings for the \(reverse engineered) [Workjam](https://workjam.com) shift management REST API built with my own [API framework](https://github.com/SmartBoy84/restman-rs)  
 # Obtaining token
 As this API is reverse-engineered, Workjam does not provide an easy method of obtaining the bearer token needed. However, it is quite easy to find this and it seems to not have an expiry.  
 1. Login at [Workjam](https://workjam.com)
@@ -72,6 +72,7 @@ The Workjam API encodes certain parameters in the API URL itself (e.g., `/api/v4
 
 # Credits/main crates used
 > By the way, you should totally look at my method of verifying URL correctness at compile-time using a type-state based linked list! Find it [here](https://github.com/SmartBoy84/workjam-rs/blob/main/src/backend/request/parts.rs).  
+- [`Restman-rs`](https://github.com/SmartBoy84/restman-rs); Simplification of various REST API implementation patterns
 - `Serde`; [de]serialisation of JSON payloads
 - `Bon`; construction of easy struct builders
 - `Chrono`; time parsing (surprisingly difficult!)
