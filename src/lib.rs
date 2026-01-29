@@ -4,14 +4,12 @@ pub mod parameters;
 pub mod parts;
 pub mod requests;
 
-use std::marker::PhantomData;
-
-pub use restman_rs::request::ApiRequest;
+pub use restman_rs::request::{ApiRequest, ApiRequestWithPara, ValidRequest};
 
 use restman_rs::{
-    ApiBackendError, ApiBackendResult, ApiHttpClient, ConstServer, MethodMarkerGetter, Server,
-    client::{AGENT, ApiClient},
-    request::{ValidRequest, endpoints::Endpoint},
+    ApiBackendError, ApiBackendResult, ApiHttpClient, ConstServer, Patch, Server,
+    client::{AGENT, ApiClient, ApiClientBackend, ApiClientBackendInner},
+    request::endpoints::Endpoint,
     ureq::UreqApiHttpClient,
 };
 
@@ -19,7 +17,9 @@ use crate::endpoints::Auth;
 
 const TOKEN_COOKIE: &str = "token";
 
-pub struct Workjam;
+pub struct Workjam {
+    pub server: String,
+}
 impl Server for Workjam {}
 impl ConstServer for Workjam {
     const ROOT: &str = "https://api.workjam.com/api";
@@ -34,9 +34,9 @@ pub enum WorkjamError<C: ApiHttpClient> {
 }
 
 // default client impl is ureq
-pub struct WorkjamUser<C: ApiHttpClient = SelectedHttpClient, S: Server = Workjam> {
-    backend: ApiClient<C>,
-    server: PhantomData<S>,
+pub struct WorkjamUser<C: ApiHttpClient = SelectedHttpClient> {
+    token: String,
+    backend: C,
 }
 
 impl WorkjamUser {
@@ -54,46 +54,33 @@ where
     }
 }
 
-impl<C, S> WorkjamUser<C, S>
+impl<C> WorkjamUser<C>
 where
     C: ApiHttpClient,
-    S: ConstServer,
 {
     fn inner_new_with_backend(backend: C, token: &str) -> Self {
-        backend.set_cookie(&format!("{TOKEN_COOKIE}={token}"), S::ROOT);
-        let backend = ApiClient::new(backend, token);
+        backend.set_cookie(&format!("{TOKEN_COOKIE}={token}"), Workjam::ROOT);
         Self {
+            token: token.to_owned(),
             backend,
-            server: PhantomData,
         }
-    }
-
-    fn backend(&self) -> &ApiClient<C> {
-        &self.backend
     }
 
     pub fn get_auth(&self) -> ApiBackendResult<<Auth as Endpoint>::Res, C>
     where
-        Auth: Endpoint<Ser = S, Method: MethodMarkerGetter<C>>,
+        C: Patch,
     {
         self.request(&ApiRequest::<Auth>::new(&()))
     }
-
-    // note; have to enforce Ser because token cookie is set to workjam
-    pub fn request<P, R>(&self, r: &R) -> ApiBackendResult<P::Res, C>
-    where
-        P: Endpoint<Ser = S>, // enforce that Server of the request is Workjam since using helper library
-        R: ValidRequest<P>,
-        P::Method: MethodMarkerGetter<C>,
-    {
-        self.backend().request(r)
-    }
-
-    // pub fn raw_request<P>(&self, r: &ApiRequest<P>) -> ApiBackendResult<String, C>
-    // where
-    //     P: Endpoint<Ser = S>, // enforce that Server of the request is Workjam since using helper library
-    //     P::Method: MethodMarkerGetter<C>,
-    // {
-    //     self.backend().raw_request(r)
-    // }
 }
+
+impl<C: ApiHttpClient> ApiClientBackend<C> for WorkjamUser<C> {
+    fn token(&self) -> &str {
+        &self.token
+    }
+    fn backend(&self) -> &C {
+        &self.backend
+    }
+}
+
+impl<C: ApiHttpClient> ApiClient<Workjam> for WorkjamUser<C> {}

@@ -4,7 +4,7 @@ use crate::requests::Position;
 
 use super::Employee;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CoworkersGroup {
     pub position: Position,

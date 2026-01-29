@@ -4,7 +4,11 @@ use chrono::Local;
 use restman_rs::request::{ApiRequest, RequestConfig};
 use serde::Deserialize;
 
-use crate::{config::{HasCompanyID, WorkjamRequestConfig}, endpoints::{Coworkers, ShiftDetail}, requests::Location};
+use crate::{
+    config::{HasCompanyID, WorkjamRequestConfig},
+    endpoints::{Coworkers, ShiftDetail},
+    requests::Location,
+};
 
 pub trait EventType {}
 #[derive(Debug)]
@@ -34,11 +38,18 @@ pub enum Event {
     Shift(EventData<Shift>),
     #[serde(rename = "AVAILABILITY_AVAILABLE")]
     Availability(EventData<Availability>),
-    #[serde(other)]
-    Unknown, // if I don't know, I don't care
+    #[serde(rename = "AVAILABILITY_UNAVAILABLE")]
+    Unavailability(EventData<Availability>),
+    #[serde(rename = "AVAILABILITY_TIME_OFF")]
+    TimeOff(EventData<Availability>),
+    #[serde(untagged)]
+    Unknown {
+        #[serde(rename = "type")]
+        event_type: String,
+    }, // if I don't know, I don't care
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 #[serde(transparent)]
 pub struct EventsRes(pub Vec<Event>);
 
