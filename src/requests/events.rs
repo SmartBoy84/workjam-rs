@@ -49,9 +49,7 @@ pub enum Event {
     }, // if I don't know, I don't care
 }
 
-#[derive(Deserialize, Debug)]
-#[serde(transparent)]
-pub struct EventsRes(pub Vec<Event>);
+pub type EventsRes = Vec<Event>;
 
 impl EventData<Shift> {
     pub fn coworkers<C: RequestConfig + HasCompanyID>(&self, c: &C) -> ApiRequest<Coworkers> {

@@ -4,11 +4,14 @@ pub mod parameters;
 pub mod parts;
 pub mod requests;
 
-pub use restman_rs::request::{ApiRequest, ApiRequestWithPara, ValidRequest};
+pub use restman_rs::{
+    client::ApiClient,
+    request::{ApiRequest, ApiRequestWithPara, ValidRequest},
+};
 
 use restman_rs::{
-    ApiBackendError, ApiBackendResult, ApiHttpClient, ConstServer, Patch, Server,
-    client::{AGENT, ApiClient, ApiClientBackend, ApiClientBackendInner},
+    ApiBackendError, ApiBackendResult, ApiHttpClient, ConstServer, DynamicServer, Patch, Server,
+    client::{AGENT, ApiClientBackend, ApiClientServer},
     request::endpoints::Endpoint,
     ureq::UreqApiHttpClient,
 };
@@ -25,13 +28,13 @@ impl ConstServer for Workjam {
     const ROOT: &str = "https://api.workjam.com/api";
 }
 
-type SelectedHttpClient = UreqApiHttpClient;
-
-#[derive(thiserror::Error, Debug)]
-pub enum WorkjamError<C: ApiHttpClient> {
-    #[error("backend error")]
-    BackendError(#[from] ApiBackendError<C>),
+impl DynamicServer for Workjam {
+    fn get_root(&self) -> &str {
+        &self.server
+    }
 }
+
+type SelectedHttpClient = UreqApiHttpClient;
 
 // default client impl is ureq
 pub struct WorkjamUser<C: ApiHttpClient = SelectedHttpClient> {
@@ -83,4 +86,4 @@ impl<C: ApiHttpClient> ApiClientBackend<C> for WorkjamUser<C> {
     }
 }
 
-impl<C: ApiHttpClient> ApiClient<Workjam> for WorkjamUser<C> {}
+impl<C: ApiHttpClient> ApiClientServer<Workjam> for WorkjamUser<C> {}

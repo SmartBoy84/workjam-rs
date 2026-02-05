@@ -11,6 +11,4 @@ pub struct CoworkersGroup {
     pub employees: Vec<Employee>,
 }
 
-#[derive(Deserialize)]
-#[serde(transparent)]
-pub struct CoworkersRes(pub Vec<CoworkersGroup>);
+pub type CoworkersRes = Vec<CoworkersGroup>;

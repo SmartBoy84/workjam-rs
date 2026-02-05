@@ -61,9 +61,7 @@ pub struct ApprovalReqRes {
     pub submission_timestamp: chrono::DateTime<Local>,
 }
 
-#[derive(Deserialize, Debug)]
-#[serde(transparent)]
-pub struct ApprovalReqsRes(pub Vec<ApprovalReqRes>);
+pub type ApprovalReqsRes = Vec<ApprovalReqRes>;
 
 impl ApprovalReqRes {
     pub fn accept<C: RequestConfig + HasCompanyID + HasEmployeeID>(

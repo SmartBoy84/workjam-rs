@@ -19,6 +19,4 @@ pub struct EmployeeDetailsRes {
     pub past_employments: Option<Vec<Employment>>,
 }
 
-#[derive(Deserialize, Debug)]
-#[serde(transparent)]
-pub struct EmployeesDetailsRes(pub Vec<EmployeeDetailsRes>);
+pub type EmployeesDetailsRes = Vec<EmployeeDetailsRes>;
