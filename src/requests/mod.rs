@@ -1,10 +1,10 @@
 use serde::Deserialize;
 
+pub mod approval;
 pub mod coworkers;
 pub mod employee;
 pub mod events;
 pub mod notifications;
-pub mod approval;
 pub mod shift;
 
 #[derive(Debug, Deserialize)]
@@ -47,15 +47,21 @@ pub struct Position {
     // externalId, externalCode, sequence ignored
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Location {
     pub id: String,
     pub name: String,
     #[serde(rename = "type")]
     pub location_type: LocationType,
-    pub time_zone_id: String
-    // externalCode, externalId, timeZoneId ignored
+    pub time_zone_id: Option<String>, // externalCode, externalId, timeZoneId ignored
+}
+
+impl PartialEq for Location {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name && self.id == other.id && self.location_type == other.location_type
+        // to ignore time zone id
+    }
 }
 
 #[derive(Deserialize, Debug, PartialEq)]

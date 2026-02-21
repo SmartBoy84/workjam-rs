@@ -23,6 +23,7 @@ pub enum ApprovalReqStatus {
     Expired,
     Canceled,
     Pending,
+    Retracted
 }
 
 #[derive(Deserialize, Debug)]

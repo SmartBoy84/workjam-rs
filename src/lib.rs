@@ -83,7 +83,7 @@ impl<C: ApiHttpClient> ApiClientBackend<C> for WorkjamUser<C> {
     }
     fn backend(&self) -> &C {
         &self.backend
-    }
+}
 }
 
 impl<C: ApiHttpClient> ApiClientServer<Workjam> for WorkjamUser<C> {}

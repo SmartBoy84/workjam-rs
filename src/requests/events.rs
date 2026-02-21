@@ -52,7 +52,7 @@ pub enum Event {
 pub type EventsRes = Vec<Event>;
 
 impl EventData<Shift> {
-    pub fn coworkers<C: RequestConfig + HasCompanyID>(&self, c: &C) -> ApiRequest<Coworkers> {
+    pub fn employees<C: RequestConfig + HasCompanyID>(&self, c: &C) -> ApiRequest<Coworkers> {
         ApiRequest::new(
             &WorkjamRequestConfig::new()
                 .shift_id(&self.id)

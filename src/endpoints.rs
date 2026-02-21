@@ -16,7 +16,7 @@ use crate::{
 };
 
 endpoint!(Workjam, pub ShiftDetail, "", Shifts, ShiftRes, (), (), GET);
-endpoint!(Workjam, pub EmployeesDetails, "employees", Companies, EmployeesDetailsRes, EmployeesDetailsPara, (), GET);
+endpoint!(Workjam, pub EmployeesDetails, "employees", Companies, EmployeesDetailsRes, EmployeesDetailsPara, (), GET); // not using Employees part, because that would require an employee id to be appended as well
 endpoint!(Workjam, pub EmployeeDetails, "", Employees, EmployeeDetailsRes, (), (), GET);
 
 // approval reqs needs V5, right now it's fine to manually specify it but overtime I will create a separate CompaniesV5 endpoint if a lot are like this
