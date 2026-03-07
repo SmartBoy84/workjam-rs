@@ -10,7 +10,7 @@ pub use restman_rs::{
 };
 
 use restman_rs::{
-    ApiBackendError, ApiBackendResult, ApiHttpClient, ConstServer, DynamicServer, Patch, Server,
+ ApiBackendResult, ApiHttpClient, ConstServer, DynamicServer, Patch, Server,
     client::{AGENT, ApiClientBackend, ApiClientServer},
     request::endpoints::Endpoint,
     ureq::UreqApiHttpClient,

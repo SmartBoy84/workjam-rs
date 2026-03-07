@@ -1,6 +1,6 @@
 use bon::Builder;
 use chrono::{DateTime, Local};
-use restman_rs::request::{QueryParameters, QueryParametersOptional};
+use restman_rs::request::QueryParameters;
 use serde::Serialize;
 
 #[derive(Serialize, Builder)]
@@ -58,14 +58,14 @@ pub enum ApprovalReqCatagory {
 
 #[derive(Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum SortBy {
+pub enum SortBy {
     RequestDateTime,
     // probably others but eh
 }
 
 #[derive(Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum SortOrder {
+pub enum SortOrder {
     Descending,
     Ascending,
 }
@@ -79,10 +79,10 @@ pub struct SortPara {
 
 #[derive(Serialize, Builder)]
 #[serde(rename_all = "camelCase")]
-pub struct ApprovalReqPara {
+pub struct ApprovalReqsPara {
     category: ApprovalReqCatagory,
     #[serde(flatten)]
     sort_para: Option<SortPara>,
 }
 
-impl QueryParameters for ApprovalReqPara {}
+impl QueryParameters for ApprovalReqsPara {}

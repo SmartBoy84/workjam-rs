@@ -20,6 +20,7 @@ request_part!(
     HasApprovalReqID,
     approval_req_id
 ); // to handle things about a specific approval req
+request_part!(Availability, "availability", ApprovalReqs);
 
 // // standalone parts
 request_part!(Shifts, "shifts", Locations, HasShiftID, shift_id);

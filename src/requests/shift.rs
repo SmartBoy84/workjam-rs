@@ -55,16 +55,16 @@ pub enum ShiftSegmentType {
 #[serde(rename_all = "camelCase")]
 pub struct ShiftBreak {
     #[serde(rename = "type")]
-    break_type: BreakType,
-    start_date_time: chrono::DateTime<Local>,
-    end_date_time: chrono::DateTime<Local>,
+    pub break_type: BreakType,
+    pub start_date_time: chrono::DateTime<Local>,
+    pub end_date_time: chrono::DateTime<Local>,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Assignee {
-    profile: Employee,
-    breaks: Vec<ShiftBreak>, // status, bookingMethod
+    pub profile: Employee,
+    pub breaks: Vec<ShiftBreak>, // status, bookingMethod
 }
 
 #[derive(Deserialize, Debug)]

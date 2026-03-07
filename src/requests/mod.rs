@@ -6,6 +6,7 @@ pub mod employee;
 pub mod events;
 pub mod notifications;
 pub mod shift;
+pub mod availability; // special: only endpoint that uses POST payload
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
