@@ -11,15 +11,20 @@ use crate::{
 };
 
 pub trait EventType {}
+
 #[derive(Debug)]
 pub struct Shift;
 #[derive(Debug)]
 pub struct Availability;
+
 impl EventType for Shift {}
 impl EventType for Availability {}
 
+const FMT: &str = "%d/%m/%Y, %a %I:%M%p";
+
 // Shared fields across all event types
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, derive_more::Display)]
+#[display("{} - {}", start_date_time.format(FMT), end_date_time.format(FMT))]
 #[serde(rename_all = "camelCase")]
 pub struct EventData<T: EventType> {
     pub id: String,
@@ -32,16 +37,25 @@ pub struct EventData<T: EventType> {
     _marker: PhantomData<T>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, derive_more::Display)]
 #[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Event {
+    #[display("Shift: {_0}")]
     Shift(EventData<Shift>),
+
+    #[display("Available: {_0}")]
     #[serde(rename = "AVAILABILITY_AVAILABLE")]
     Availability(EventData<Availability>),
+
+    #[display("Unavailable: {_0}")]
     #[serde(rename = "AVAILABILITY_UNAVAILABLE")]
     Unavailability(EventData<Availability>),
+
+    #[display("Time off: {_0}")]
     #[serde(rename = "AVAILABILITY_TIME_OFF")]
     TimeOff(EventData<Availability>),
+
+    #[display("Unknown<{event_type}>")]
     #[serde(untagged)]
     Unknown {
         #[serde(rename = "type")]

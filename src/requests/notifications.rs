@@ -8,7 +8,7 @@ use crate::{
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum EntityType {
+pub enum EntityType {
     Shift,
     TimeCard,
     Availability,
